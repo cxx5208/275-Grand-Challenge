@@ -17,7 +17,7 @@ The system architecture includes the following components:
 - **Main Scheduler**: Allocates tasks using advanced scheduling algorithms.
 - **Register**: Maintains a registry of clients and workers, monitoring system health.
 
-![System Architecture]()
+## System Architecture
 <img width="1340" alt="Screenshot 2024-05-23 at 1 08 18 AM" src="https://github.com/cxx5208/275-Grand-Challenge/assets/76988460/303a1871-2a7f-4f66-9a8d-aeac4afd9f0d">
 
 
@@ -41,8 +41,6 @@ The system architecture includes the following components:
 
 ### gRPC Services
 - **Multiple Services**: Dedicated to specific communication pathways.
-
-![Shared Memory and gRPC Communication](https://lucid.app/lucidchart/ca5e9169-b038-400b-8eb4-76e449eccb24/edit?viewport_loc=-1047%2C138%2C4419%2C2392%2C0_0&invitationId=inv_58301903-06af-4a2a-83be-d0cdd904016b)
 
 ## Phases and Key Improvements
 ### Phase 1: Initial Planning and Architecture Design
