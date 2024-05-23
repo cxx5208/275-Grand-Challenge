@@ -1,105 +1,73 @@
 # High-Performance Distributed Task Scheduler Using gRPC
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [System Architecture](#system-architecture)
-3. [Communication Protocol and Data Flow](#communication-protocol-and-data-flow)
-4. [Performance and Scalability](#performance-and-scalability)
-5. [Implementation Details](#implementation-details)
-6. [Phase Details and Key Improvements](#phase-details-and-key-improvements)
-7. [Execution Results](#execution-results)
-8. [References](#references)
+## Overview
+A high-performance distributed task scheduler leveraging gRPC to facilitate efficient communication across multiple nodes. The system optimizes task distribution and execution in a scalable, fault-tolerant, and dynamic manner.
 
----
+## Features
+- **Low Latency and High Throughput**: Using gRPC and shared memory for efficient communication and data sharing.
+- **Scalability**: Horizontal scaling by adding worker nodes.
+- **Advanced Scheduling Algorithms**: Ensuring optimal task allocation and resource utilization.
+- **Fault Tolerance**: Robust mechanisms for fault detection and task reassignment.
 
-## Project Overview
-This project involves the development of a high-performance distributed task scheduler leveraging gRPC (Google Remote Procedure Call) for inter-process communication. The primary objective is to optimize task distribution and execution across multiple nodes, ensuring scalability, fault tolerance, and efficiency in modern distributed computing environments.
+## Architecture
+The system architecture includes the following components:
+- **Client**: Submits tasks and handles asynchronous task responses.
+- **Worker**: Executes tasks and sends heartbeat signals to the Register.
+- **Process Lifecycle Manager (PLM)**: Manages task queue and task-worker mappings.
+- **Main Scheduler**: Allocates tasks using advanced scheduling algorithms.
+- **Register**: Maintains a registry of clients and workers, monitoring system health.
 
----
+![System Architecture](<img width="1352" alt="Screenshot 2024-05-23 at 1 07 34 AM" src="https://github.com/cxx5208/275-Grand-Challenge/assets/76988460/ade5d2c3-3661-4dd6-90c2-734dbf097e4c">)
 
-## System Architecture
-### Core Components
-- **Client**: Interface for task submission via gRPC. Handles asynchronous task responses.
-- **Worker**: Executes assigned tasks, transmits heartbeat signals to the Register.
-- **Process Lifecycle Manager (PLM)**: Manages task queue, assigns task IDs, maintains mappings between tasks and workers.
-- **Main Scheduler**: Allocates tasks based on advanced scheduling algorithms, utilizing task and worker heaps stored in shared memory.
-- **Register**: Monitors system health through heartbeat signals, updates worker status, manages fault detection and recovery.
-
-### Architecture Diagram
-![System Architecture](https://lucid.app/lucidchart/ca5e9169-b038-400b-8eb4-76e449eccb24/edit?viewport_loc=-1047%2C138%2C4419%2C2392%2C0_0&invitationId=inv_58301903-06af-4a2a-83be-d0cdd904016b)
-
----
 
 ## Communication Protocol and Data Flow
-1. **Task Submission**: The Client submits tasks to the PLM using the `submitTask` gRPC method. The PLM assigns a unique task ID and enqueues the task in the task heap.
-2. **Task Assignment**: The Main Scheduler dequeues tasks from the task heap, selects appropriate workers from the worker heap, updates the task-worker mapping, and dispatches tasks to workers via gRPC.
-3. **Task Execution and Result Reporting**: Workers execute tasks and report results within heartbeat messages to the Register. The Register updates the task status and notifies the PLM.
-4. **Result Delivery**: The PLM retrieves task results from the task-worker mapping and sends them back to the Client using gRPC.
-5. **Failure Handling**: The Register detects worker failures through missing heartbeats, marks workers as dead, updates the worker heap, and informs the PLM for task reassignment.
-
----
+1. **Task Submission**: Client submits tasks to PLM using `submitTask` gRPC method.
+2. **Task Assignment**: Main Scheduler assigns tasks to workers.
+3. **Task Execution and Result Reporting**: Workers execute tasks and report results via heartbeat messages.
+4. **Result Delivery**: PLM sends task results to the client.
+5. **Failure Handling**: Register detects worker failures and informs PLM for task reassignment.
 
 ## Performance and Scalability
-### Key Features
-- **Low Latency and High Throughput**: Achieved using gRPC for inter-process communication and shared memory for data storage and access.
-- **Horizontal Scalability**: System can scale by adding additional worker nodes, dynamically distributing load.
-- **Optimal Load Balancing**: Advanced scheduling algorithms ensure efficient task allocation and resource utilization.
-
-### Performance Enhancements
-- **Shared Memory**: Utilized for task and worker heaps, providing quick access and updates, reducing inter-process communication overhead.
-- **gRPC Communication**: Ensures efficient, low-latency communication between system components.
-
----
+- **Shared Memory**: Used for task and worker heaps, enabling quick access and updates.
+- **gRPC Communication**: Provides efficient, low-latency communication between components.
 
 ## Implementation Details
-### Shared Memory Utilization
-- **Initialization**: Shared memory segments initialized using POSIX system calls (`shmget`, `shmat`, `shmctl`). Memory allocation planned to ensure contiguous space for task and worker heaps.
-- **Data Structures**: Task heaps implemented as priority queues for efficient task management. Worker heaps managed availability and load using similar priority queue structures.
-- **Synchronization**: Mutexes and semaphores used to synchronize access to shared memory. Atomic operations employed for critical sections to enable lock-free, thread-safe modifications.
-- **Memory Barriers**: Prevent CPU memory operation reordering, ensuring immediate visibility of changes across processes.
-- **Error Handling**: Robust mechanisms to manage memory allocation failures and access violations, with fallback procedures for graceful degradation or reinitialization of shared memory segments.
+### Shared Memory
+- **Initialization**: Using POSIX system calls.
+- **Data Structures**: Priority queues for task and worker heaps.
+- **Synchronization**: Mutexes and semaphores ensure data consistency.
+- **Memory Barriers**: Prevent CPU memory operation reordering.
 
 ### gRPC Services
-- **Multiple gRPC Services**: Implemented to facilitate specific communication pathways for task submissions, task assignment, heartbeat signals, and worker status updates.
+- **Multiple Services**: Dedicated to specific communication pathways.
 
-### Shared Memory and gRPC Communication Diagram
 ![Shared Memory and gRPC Communication](https://lucid.app/lucidchart/ca5e9169-b038-400b-8eb4-76e449eccb24/edit?viewport_loc=-1047%2C138%2C4419%2C2392%2C0_0&invitationId=inv_58301903-06af-4a2a-83be-d0cdd904016b)
 
----
-
-## Phase Details and Key Improvements
+## Phases and Key Improvements
 ### Phase 1: Initial Planning and Architecture Design
-- **Initial Architecture**: Designed with Client, Worker, PLM, Main Scheduler, and Register components.
-- **Basic Implementation**: Task submission and worker assignment using gRPC.
+- Designed initial architecture and implemented basic task submission and worker assignment using gRPC.
 
 ### Phase 2: Refinement of PLM and Scheduler Integration
-- **Enhancements**: Improved task ID assignment, queue management, integrated advanced scheduling algorithms.
+- Enhanced task ID assignment and queue management, integrated advanced scheduling algorithms.
 
 ### Phase 3: Optimization and Concurrency Management
-- **Concurrency Improvements**: Replaced MPI with shared memory reading, introduced a singleton class for centralized management, enhanced locking mechanisms.
+- Replaced MPI with shared memory reading, introduced centralized management, enhanced locking mechanisms.
 
 ### Phase 4: Consolidation and Integration of PLM into gRPC
-- **Integration**: Moved task assignment to Main Scheduler, optimized shared memory usage, eliminated the need for separate singleton classes.
+- Moved task assignment to Main Scheduler, optimized shared memory usage.
 
 ### Phase 5: Final Optimization and Full Communication Establishment
-- **Comprehensive gRPC Communication**: Implemented across all components.
-- **Real-Time Monitoring**: Enhanced with periodic heartbeat signals, developed sophisticated task reassignment strategies.
+- Implemented comprehensive gRPC communication, real-time monitoring, and sophisticated task reassignment strategies.
 
----
-
-## Execution Results
-### Command:
+## Execution
+### Compilation:
 ```sh
 g++ -o plm plm.cpp heap.cpp -lpthread
+```
+### Execution:
+```sh
 ./plm
 ```
-
-### Outcome
-- **Efficiency**: Demonstrated efficient task scheduling and execution across multiple nodes.
-- **Real-Time Monitoring**: Achieved real-time status updates and task reassignment.
-- **Fault Tolerance**: Ensured robust fault detection and recovery mechanisms.
-
----
 
 ## References
 1. Tanenbaum, A. S., & Van Steen, M. (2007). Distributed Systems: Principles and Paradigms (2nd ed.). Prentice Hall.
@@ -111,3 +79,4 @@ g++ -o plm plm.cpp heap.cpp -lpthread
 
 ---
 
+For further details, refer to the full project report and codebase.
