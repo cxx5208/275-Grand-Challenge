@@ -17,7 +17,8 @@ The system architecture includes the following components:
 - **Main Scheduler**: Allocates tasks using advanced scheduling algorithms.
 - **Register**: Maintains a registry of clients and workers, monitoring system health.
 
-![System Architecture](<img width="1352" alt="Screenshot 2024-05-23 at 1 07 34 AM" src="https://github.com/cxx5208/275-Grand-Challenge/assets/76988460/ade5d2c3-3661-4dd6-90c2-734dbf097e4c">)
+![System Architecture]()
+<img width="1340" alt="Screenshot 2024-05-23 at 1 08 18 AM" src="https://github.com/cxx5208/275-Grand-Challenge/assets/76988460/303a1871-2a7f-4f66-9a8d-aeac4afd9f0d">
 
 
 ## Communication Protocol and Data Flow
